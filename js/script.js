@@ -44,13 +44,30 @@ function loadData() {
 
     $.getJSON();
 
+    //error handling for wiki api
+    var wikiRequestTimeout=setTimeout(function(){
+        $wikiHeaderElem.text("failed to load wikipedia resources");
+      },8000);
+    //load wiki api
+    var wikiUrL = 'https://en.wikipedia.org/w/api.php?action=opensearch&search='+cityStr+'&format=json&callback=wikiCallback';
 
+    $.ajax({
+      url: wikiUrL,
+      datatype: 'jsonp',
+      //jsonp: callback
+    }).done(function(response) {
+        var articleList = response[1];
+        
+        for (var i=0; i < articleList.length; i++) {
+          articleStr = articleList[i];
+          var articleUrl = 'http://en.wikipedia.org/wiki/' + articleStr;
+          $wikiElem.append('<li><a href="'+ articleUrl +'">' +
+              articleStr +'</a></li>')
+        };
+        clearTimeout(wikiRequestTimeout); //clear the error if the Response is succussful
+      });
 
-
-
-
-
-    return false;
+  return false;
 };
 
 $('#form-container').submit(loadData);
